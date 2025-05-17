@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using UnityEngine.SceneManagement; 
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,6 +15,18 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private float movementX;
     private float movementY;
+
+    public float jumpForce = 7.0f;
+    private bool isGrounded = true;
+
+    public Button restartButton;
+    public Button startMenuButton;
+
+    public void RestartGame()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        Debug.Log("Restart button clicked!");
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -38,6 +52,28 @@ public class PlayerController : MonoBehaviour
         if (count >= 12)
         {
             winTextObject.SetActive(true);
+
+            Destroy(GameObject.FindGameObjectWithTag("Enemy"));
+            restartButton.gameObject.SetActive(true);
+            startMenuButton.gameObject.SetActive(true);
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
+        }
+
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            //Destroy(gameObject);
+            gameObject.SetActive(false);
+            winTextObject.gameObject.SetActive(true);
+            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
+            restartButton.gameObject.SetActive(true);
+            startMenuButton.gameObject.SetActive(true);
         }
     }
 
@@ -51,7 +87,11 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Keyboard.current.spaceKey.wasPressedThisFrame && isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isGrounded = false;
+        }
     }
 
     void OnTriggerEnter(Collider other)
@@ -60,6 +100,10 @@ public class PlayerController : MonoBehaviour
         {
             other.gameObject.SetActive(false);
             count = count + 1;
+
+            speed += 0.5f;
+
+            Debug.Log("Current Speed: " + speed);
 
             SetCountText();
         }
