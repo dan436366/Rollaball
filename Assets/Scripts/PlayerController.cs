@@ -22,10 +22,16 @@ public class PlayerController : MonoBehaviour
     public Button restartButton;
     public Button startMenuButton;
 
+    public TextMeshProUGUI speedText;
     public void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         Debug.Log("Restart button clicked!");
+    }
+
+    void SetSpeedText()
+    {
+        speedText.text = "Speed: " + speed.ToString("F1");
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -35,6 +41,7 @@ public class PlayerController : MonoBehaviour
         count = 0;
 
         SetCountText();
+        SetSpeedText();
         winTextObject.SetActive(false);
     }
 
@@ -102,6 +109,8 @@ public class PlayerController : MonoBehaviour
             count = count + 1;
 
             speed += 0.5f;
+
+            SetSpeedText();
 
             Debug.Log("Current Speed: " + speed);
 
